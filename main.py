@@ -34,7 +34,7 @@ def static_api(response, scale):
     # Собираем параметры для запроса к StaticMapsAPI:
     map_params = {
         "ll": ",".join([toponym_longitude, toponym_lattitude]),
-        "spn": ",".join(scale),
+        "z": scale,
         "l": "map"
     }
 
@@ -63,13 +63,13 @@ def json_file(response):
 class Example(QWidget):
     def __init__(self):
         super().__init__()
-        self.scale = ['0.005', '0.005']
-        self.coords = '37.22093,55.99799'
+        self.scale = '4'
+        self.coords = ['37.22093', '55.99799']
         self.getImage()
         self.initUI()
 
     def getImage(self):
-        geocoder = geocoder_find(self.coords)
+        geocoder = geocoder_find(','.join(self.coords))
         response = static_api(geocoder, self.scale)
 
         self.map_file = "map.png"
@@ -87,15 +87,22 @@ class Example(QWidget):
         self.image = QLabel(self)
         self.image.move(0, 0)
         self.image.resize(600, 450)
-
         self.show_image()
+
+
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_PageUp:
-            self.scale[0] = str(float(self.scale[0]) / 2)
-            self.scale[1] = str(float(self.scale[1]) / 2)
+            self.scale = str(int(self.scale) + 1)
         if event.key() == Qt.Key_PageDown:
-            self.scale[0] = str(float(self.scale[0]) * 2)
-            self.scale[1] = str(float(self.scale[1]) * 2)
+            self.scale = str(int(self.scale) - 1)
+        if event.key() == Qt.Key_Right:
+            self.coords[0] = str(float(self.coords[0]) + 0.1)
+        if event.key() == Qt.Key_Up:
+            self.coords[1] = str(float(self.coords[1]) + 0.1)
+        if event.key() == Qt.Key_Down:
+            self.coords[1] = str(float(self.coords[1]) - 0.1)
+        if event.key() == Qt.Key_Left:
+            self.coords[0] = str(float(self.coords[0]) - 0.1)
         self.getImage()
         self.show_image()
 
