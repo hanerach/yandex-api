@@ -6,19 +6,58 @@ import requests
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel
+from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 SCREEN_SIZE = [600, 450]
 
 
-# def scale_finder(response):
-#     json_response = response.json()
-#     toponym = json_response["response"]["GeoObjectCollection"][
-#         "featureMember"][0]["GeoObject"]
-#     toponym_lc = toponym['boundedBy']['Envelope']['lowerCorner'].split(' ')
-#     toponym_uc = toponym['boundedBy']['Envelope']['upperCorner'].split(' ')
-#     toponym_size_tuple = str(float(toponym_uc[0]) - float(toponym_lc[0])), str(
-#         float(toponym_uc[1]) - float(toponym_lc[1]))
-#     return list(toponym_size_tuple)
+class Ui_Map(object):
+    def setupUi(self, Dialog):
+        Dialog.setObjectName("Dialog")
+        Dialog.resize(1015, 870)
+        self.horizontalLayout = QtWidgets.QHBoxLayout(Dialog)
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.gridLayout = QtWidgets.QGridLayout()
+        self.gridLayout.setObjectName("gridLayout")
+        self.verticalLayout = QtWidgets.QVBoxLayout()
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.image = QtWidgets.QLabel(Dialog)
+        self.image.setObjectName("image")
+        self.verticalLayout.addWidget(self.image)
+        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        self.satelliteRb = QtWidgets.QRadioButton(Dialog)
+        self.satelliteRb.setObjectName("satelliteRb")
+        self.LayersBtnGroup = QtWidgets.QButtonGroup(Dialog)
+        self.LayersBtnGroup.setObjectName("LayersBtnGroup")
+        self.LayersBtnGroup.addButton(self.satelliteRb)
+        self.horizontalLayout_2.addWidget(self.satelliteRb)
+        self.hybridRb = QtWidgets.QRadioButton(Dialog)
+        self.hybridRb.setObjectName("hybridRb")
+        self.LayersBtnGroup.addButton(self.hybridRb)
+        self.horizontalLayout_2.addWidget(self.hybridRb)
+        self.schemeRb = QtWidgets.QRadioButton(Dialog)
+        self.schemeRb.setObjectName("schemeRb")
+        self.LayersBtnGroup.addButton(self.schemeRb)
+        self.horizontalLayout_2.addWidget(self.schemeRb)
+        self.verticalLayout.addLayout(self.horizontalLayout_2)
+        self.verticalLayout.setStretch(0, 6)
+        self.verticalLayout.setStretch(1, 1)
+        self.gridLayout.addLayout(self.verticalLayout, 1, 0, 1, 1)
+        self.horizontalLayout.addLayout(self.gridLayout)
+        self.satelliteRb.setChecked(True)
+
+        self.retranslateUi(Dialog)
+        QtCore.QMetaObject.connectSlotsByName(Dialog)
+
+    def retranslateUi(self, Dialog):
+        _translate = QtCore.QCoreApplication.translate
+        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
+        self.image.setText(_translate("Dialog", "TextLabel"))
+        self.satelliteRb.setText(_translate("Dialog", "Спутник"))
+        self.hybridRb.setText(_translate("Dialog", "Гибрид"))
+        self.schemeRb.setText(_translate("Dialog", "Схема"))
 
 
 def static_api(response, scale):
@@ -60,11 +99,12 @@ def json_file(response):
     file.close()
 
 
-class Example(QWidget):
+class Example(QWidget, Ui_Map):
     def __init__(self):
         super().__init__()
         self.scale = '10'
         self.coords = ['37.22093', '55.99799']
+        self.setupUi(self)
         self.getImage()
         self.initUI()
 
@@ -84,9 +124,6 @@ class Example(QWidget):
     def initUI(self):
         self.setGeometry(100, 100, *SCREEN_SIZE)
         self.setWindowTitle('Отображение карты')
-        self.image = QLabel(self)
-        self.image.move(0, 0)
-        self.image.resize(600, 450)
         self.show_image()
 
 
