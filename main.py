@@ -64,12 +64,12 @@ class Example(QWidget):
     def __init__(self):
         super().__init__()
         self.scale = ['0.005', '0.005']
-        self.coords = '37.22093,55.99799'
+        self.coords = ['37.22093', '55.99799']
         self.getImage()
         self.initUI()
 
     def getImage(self):
-        geocoder = geocoder_find(self.coords)
+        geocoder = geocoder_find(','.join(self.coords))
         response = static_api(geocoder, self.scale)
 
         self.map_file = "map.png"
@@ -96,6 +96,15 @@ class Example(QWidget):
         if event.key() == Qt.Key_PageDown:
             self.scale[0] = str(float(self.scale[0]) * 2)
             self.scale[1] = str(float(self.scale[1]) * 2)
+        if event.key() == Qt.Key_Right:
+            self.coords[0] = str(float(self.coords[0]) + 0.1)
+        # if event.key() == Qt.Key_Up:
+        #     self.coords[0] = str(float(self.coords[0]) + 0.001)
+        # if event.key() == Qt.Key_Down:
+        #     self.coords[0] = str(float(self.coords[0]) + 0.001)
+        # if event.key() == Qt.Key_Left:
+        #     self.coords[0] = str(float(self.coords[0]) + 0.001)
+        print(self.coords)
         self.getImage()
         self.show_image()
 
