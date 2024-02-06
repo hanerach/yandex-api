@@ -3,25 +3,25 @@ import os
 import sys
 
 import requests
-from PyQt5 import QtGui
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel
 
 SCREEN_SIZE = [600, 450]
 
 
-def scale_finder(response):
-    json_response = response.json()
-    toponym = json_response["response"]["GeoObjectCollection"][
-        "featureMember"][0]["GeoObject"]
-    toponym_lc = toponym['boundedBy']['Envelope']['lowerCorner'].split(' ')
-    toponym_uc = toponym['boundedBy']['Envelope']['upperCorner'].split(' ')
-    toponym_size_tuple = str(float(toponym_uc[0]) - float(toponym_lc[0])), str(
-        float(toponym_uc[1]) - float(toponym_lc[1]))
-    return list(toponym_size_tuple)
+# def scale_finder(response):
+#     json_response = response.json()
+#     toponym = json_response["response"]["GeoObjectCollection"][
+#         "featureMember"][0]["GeoObject"]
+#     toponym_lc = toponym['boundedBy']['Envelope']['lowerCorner'].split(' ')
+#     toponym_uc = toponym['boundedBy']['Envelope']['upperCorner'].split(' ')
+#     toponym_size_tuple = str(float(toponym_uc[0]) - float(toponym_lc[0])), str(
+#         float(toponym_uc[1]) - float(toponym_lc[1]))
+#     return list(toponym_size_tuple)
 
 
-def static_api(response):
+def static_api(response, scale):
     json_response = response.json()
     # Получаем первый топоним из ответа геокодера.
     toponym = json_response["response"]["GeoObjectCollection"][
@@ -30,8 +30,6 @@ def static_api(response):
     toponym_coodrinates = toponym["Point"]["pos"]
     # Долгота и широта:
     toponym_longitude, toponym_lattitude = toponym_coodrinates.split(" ")
-    # Масштаб
-    scale = scale_finder(response)
 
     # Собираем параметры для запроса к StaticMapsAPI:
     map_params = {
@@ -65,37 +63,51 @@ def json_file(response):
 class Example(QWidget):
     def __init__(self):
         super().__init__()
+        self.scale = ['0.005', '0.005']
+        self.coords = '37.22093,55.99799'
         self.getImage()
         self.initUI()
 
     def getImage(self):
-        geocoder = geocoder_find('зеленоград корпус 314')
-        response = static_api(geocoder)
-        # if not response:
-        #     print("Ошибка выполнения запроса:")
-        #     print(map_request)
-        #     print("Http статус:", response.status_code, "(", response.reason, ")")
-        #     sys.exit(1)
+        geocoder = geocoder_find(self.coords)
+        response = static_api(geocoder, self.scale)
 
-        # Запишем полученное изображение в файл.
         self.map_file = "map.png"
         with open(self.map_file, "wb") as file:
             file.write(response.content)
+
+    def show_image(self):
+        self.pixmap = QPixmap(self.map_file)
+        self.image.setPixmap(self.pixmap)
 
 
     def initUI(self):
         self.setGeometry(100, 100, *SCREEN_SIZE)
         self.setWindowTitle('Отображение карты')
-        self.pixmap = QPixmap(self.map_file)
         self.image = QLabel(self)
         self.image.move(0, 0)
         self.image.resize(600, 450)
-        self.image.setPixmap(self.pixmap)
+
+        self.show_image()
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_PageUp:
+            self.scale[0] = str(float(self.scale[0]) / 2)
+            self.scale[1] = str(float(self.scale[1]) / 2)
+        if event.key() == Qt.Key_PageDown:
+            self.scale[0] = str(float(self.scale[0]) * 2)
+            self.scale[1] = str(float(self.scale[1]) * 2)
+        self.getImage()
+        self.show_image()
+
 
 
     def closeEvent(self, event):
         """При закрытии формы подчищаем за собой"""
         os.remove(self.map_file)
+
+    def change_scale(self):
+        pass
+
 
 
 if __name__ == '__main__':
