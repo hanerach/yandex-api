@@ -63,7 +63,7 @@ def json_file(response):
 class Example(QWidget):
     def __init__(self):
         super().__init__()
-        self.scale = '4'
+        self.scale = '10'
         self.coords = ['37.22093', '55.99799']
         self.getImage()
         self.initUI()
