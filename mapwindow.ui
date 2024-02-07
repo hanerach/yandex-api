@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1015</width>
-    <height>870</height>
+    <width>732</width>
+    <height>782</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,32 @@
    <item>
     <layout class="QGridLayout" name="gridLayout">
      <item row="1" column="0">
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="6,1">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QPushButton" name="schemeButton">
+           <property name="text">
+            <string>Схема</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="satelliteButton">
+           <property name="text">
+            <string>Спутник</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="hybridButton">
+           <property name="text">
+            <string>Гибрид</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
        <item>
         <widget class="QLabel" name="image">
          <property name="text">
@@ -26,35 +51,53 @@
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="4,1,1">
          <item>
-          <widget class="QRadioButton" name="satelliteRb">
-           <property name="text">
-            <string>Спутник</string>
+          <widget class="QLineEdit" name="inputLineEdit">
+           <property name="inputMask">
+            <string/>
            </property>
-           <attribute name="buttonGroup">
-            <string notr="true">LayersBtnGroup</string>
-           </attribute>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="placeholderText">
+            <string>Введите адрес</string>
+           </property>
+           <property name="clearButtonEnabled">
+            <bool>false</bool>
+           </property>
           </widget>
          </item>
          <item>
-          <widget class="QRadioButton" name="hybridRb">
+          <widget class="QPushButton" name="findButton">
            <property name="text">
-            <string>Гибрид</string>
+            <string>Искать</string>
            </property>
-           <attribute name="buttonGroup">
-            <string notr="true">LayersBtnGroup</string>
-           </attribute>
           </widget>
          </item>
          <item>
-          <widget class="QRadioButton" name="schemeRb">
+          <widget class="QPushButton" name="resetButton">
            <property name="text">
-            <string>Схема</string>
+            <string>Сбросить</string>
            </property>
-           <attribute name="buttonGroup">
-            <string notr="true">LayersBtnGroup</string>
-           </attribute>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="2,1">
+         <item>
+          <widget class="QLabel" name="adressLabel">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="indexButton">
+           <property name="text">
+            <string>Вкл/выкл почтовый индекс</string>
+           </property>
           </widget>
          </item>
         </layout>
@@ -65,9 +108,15 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>schemeButton</tabstop>
+  <tabstop>satelliteButton</tabstop>
+  <tabstop>hybridButton</tabstop>
+  <tabstop>inputLineEdit</tabstop>
+  <tabstop>findButton</tabstop>
+  <tabstop>resetButton</tabstop>
+  <tabstop>indexButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
- <buttongroups>
-  <buttongroup name="LayersBtnGroup"/>
- </buttongroups>
 </ui>
