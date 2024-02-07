@@ -109,9 +109,8 @@ def geocoder_find(toponym_to_find):
         "apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
         "geocode": toponym_to_find,
         "format": "json"}
-    # print(geocoder_api_server + )
-    qqq = requests.get(geocoder_api_server, params=geocoder_params)
-    return qqq
+
+    return requests.get(geocoder_api_server, params=geocoder_params)
 
 
 def json_file(response):
@@ -156,6 +155,7 @@ class Example(QWidget, Ui_Map):
 
     def reset_point(self):
         self.point = ''
+        self.adressLabel.setText('')
         self.getImage()
         self.show_image()
 
@@ -167,6 +167,8 @@ class Example(QWidget, Ui_Map):
                 "featureMember"][0]["GeoObject"]['Point']['pos'].split(' ')
             self.point = json_request["response"]["GeoObjectCollection"][
                 "featureMember"][0]["GeoObject"]['Point']['pos'].split(' ')
+            self.adressLabel.setText(json_request["response"]["GeoObjectCollection"][
+                "featureMember"][0]["GeoObject"]["metaDataProperty"]["GeocoderMetaData"]["text"])
             self.getImage()
             self.show_image()
         except Exception:
