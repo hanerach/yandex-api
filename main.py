@@ -152,6 +152,12 @@ class Example(QWidget, Ui_Map):
         self.hybridButton.clicked.connect(self.change_layer)
 
         self.findButton.clicked.connect(self.find_object)
+        self.resetButton.clicked.connect(self.reset_point)
+
+    def reset_point(self):
+        self.point = ''
+        self.getImage()
+        self.show_image()
 
     def find_object(self):
         request = geocoder_find(self.inputLineEdit.text())
