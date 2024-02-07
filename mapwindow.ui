@@ -22,6 +22,9 @@
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
           <widget class="QPushButton" name="schemeButton">
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="text">
             <string>Схема</string>
            </property>
@@ -29,6 +32,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="satelliteButton">
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="text">
             <string>Спутник</string>
            </property>
@@ -36,6 +42,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="hybridButton">
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="text">
             <string>Гибрид</string>
            </property>
@@ -45,6 +54,9 @@
        </item>
        <item>
         <widget class="QLabel" name="image">
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
          <property name="text">
           <string>TextLabel</string>
          </property>
@@ -54,6 +66,9 @@
         <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="4,1,1">
          <item>
           <widget class="QLineEdit" name="inputLineEdit">
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
            <property name="inputMask">
             <string/>
            </property>
@@ -70,6 +85,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="findButton">
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="text">
             <string>Искать</string>
            </property>
@@ -77,6 +95,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="resetButton">
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="text">
             <string>Сбросить</string>
            </property>
@@ -95,6 +116,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="indexButton">
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="text">
             <string>Вкл/выкл почтовый индекс</string>
            </property>

@@ -24,30 +24,37 @@ class Ui_Map(object):
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.schemeButton = QtWidgets.QPushButton(Dialog)
+        self.schemeButton.setFocusPolicy(QtCore.Qt.NoFocus)
         self.schemeButton.setObjectName("schemeButton")
         self.horizontalLayout_2.addWidget(self.schemeButton)
         self.satelliteButton = QtWidgets.QPushButton(Dialog)
+        self.satelliteButton.setFocusPolicy(QtCore.Qt.NoFocus)
         self.satelliteButton.setObjectName("satelliteButton")
         self.horizontalLayout_2.addWidget(self.satelliteButton)
         self.hybridButton = QtWidgets.QPushButton(Dialog)
+        self.hybridButton.setFocusPolicy(QtCore.Qt.NoFocus)
         self.hybridButton.setObjectName("hybridButton")
         self.horizontalLayout_2.addWidget(self.hybridButton)
         self.verticalLayout.addLayout(self.horizontalLayout_2)
         self.image = QtWidgets.QLabel(Dialog)
+        self.image.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.image.setObjectName("image")
         self.verticalLayout.addWidget(self.image)
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
         self.inputLineEdit = QtWidgets.QLineEdit(Dialog)
+        self.inputLineEdit.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.inputLineEdit.setInputMask("")
         self.inputLineEdit.setText("")
         self.inputLineEdit.setClearButtonEnabled(False)
         self.inputLineEdit.setObjectName("inputLineEdit")
         self.horizontalLayout_4.addWidget(self.inputLineEdit)
         self.findButton = QtWidgets.QPushButton(Dialog)
+        self.findButton.setFocusPolicy(QtCore.Qt.NoFocus)
         self.findButton.setObjectName("findButton")
         self.horizontalLayout_4.addWidget(self.findButton)
         self.resetButton = QtWidgets.QPushButton(Dialog)
+        self.resetButton.setFocusPolicy(QtCore.Qt.NoFocus)
         self.resetButton.setObjectName("resetButton")
         self.horizontalLayout_4.addWidget(self.resetButton)
         self.horizontalLayout_4.setStretch(0, 4)
@@ -61,6 +68,7 @@ class Ui_Map(object):
         self.adressLabel.setObjectName("adressLabel")
         self.horizontalLayout_6.addWidget(self.adressLabel)
         self.indexButton = QtWidgets.QPushButton(Dialog)
+        self.indexButton.setFocusPolicy(QtCore.Qt.NoFocus)
         self.indexButton.setObjectName("indexButton")
         self.horizontalLayout_6.addWidget(self.indexButton)
         self.horizontalLayout_6.setStretch(0, 2)
@@ -71,6 +79,12 @@ class Ui_Map(object):
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
+        Dialog.setTabOrder(self.schemeButton, self.satelliteButton)
+        Dialog.setTabOrder(self.satelliteButton, self.hybridButton)
+        Dialog.setTabOrder(self.hybridButton, self.inputLineEdit)
+        Dialog.setTabOrder(self.inputLineEdit, self.findButton)
+        Dialog.setTabOrder(self.findButton, self.resetButton)
+        Dialog.setTabOrder(self.resetButton, self.indexButton)
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
@@ -83,6 +97,7 @@ class Ui_Map(object):
         self.findButton.setText(_translate("Dialog", "Искать"))
         self.resetButton.setText(_translate("Dialog", "Сбросить"))
         self.indexButton.setText(_translate("Dialog", "Вкл/выкл почтовый индекс"))
+
 
 
 def static_api(coords, scale, layer, point):
@@ -122,6 +137,8 @@ def json_file(response):
 class Example(QWidget, Ui_Map):
     def __init__(self):
         super().__init__()
+        self.indexFlag = 0
+        self.adress = ''
         self.scale = '10'
         self.coords = ['37.22093', '55.99799']
         self.layer = 'map'
@@ -153,9 +170,23 @@ class Example(QWidget, Ui_Map):
         self.findButton.clicked.connect(self.find_object)
         self.resetButton.clicked.connect(self.reset_point)
 
+        self.indexButton.clicked.connect(self.index)
+
+    def index(self):
+        self.indexFlag = (self.indexFlag + 1) % 2
+        try:
+            if self.indexFlag:
+                self.adress = self.adress + ', ' + self.toponym_adress["postal_code"]
+            else:
+                self.adress = self.toponym_adress["formatted"]
+            self.adressLabel.setText(self.adress)
+        except:
+            pass
+
     def reset_point(self):
         self.point = ''
         self.adressLabel.setText('')
+        self.inputLineEdit.setText('')
         self.getImage()
         self.show_image()
 
@@ -167,8 +198,10 @@ class Example(QWidget, Ui_Map):
                 "featureMember"][0]["GeoObject"]['Point']['pos'].split(' ')
             self.point = json_request["response"]["GeoObjectCollection"][
                 "featureMember"][0]["GeoObject"]['Point']['pos'].split(' ')
-            self.adressLabel.setText(json_request["response"]["GeoObjectCollection"][
-                "featureMember"][0]["GeoObject"]["metaDataProperty"]["GeocoderMetaData"]["text"])
+            self.toponym_adress = json_request["response"]["GeoObjectCollection"][
+                "featureMember"][0]["GeoObject"]["metaDataProperty"]["GeocoderMetaData"]["Address"]
+            self.adress = self.toponym_adress["formatted"]
+            self.adressLabel.setText(self.adress)
             self.getImage()
             self.show_image()
         except Exception:
@@ -185,7 +218,6 @@ class Example(QWidget, Ui_Map):
         self.show_image()
 
     def keyPressEvent(self, event):
-        self.inputLineEdit.clearFocus()
         if event.key() == Qt.Key_PageUp:
             self.scale = str(int(self.scale) + 1)
         if event.key() == Qt.Key_PageDown:
