@@ -85,7 +85,7 @@ class Ui_Map(object):
         self.indexButton.setText(_translate("Dialog", "Вкл/выкл почтовый индекс"))
 
 
-def static_api(response, scale, layer):
+def static_api(response, scale, layer, point):
     json_response = response.json()
     # Получаем первый топоним из ответа геокодера.
     toponym = json_response["response"]["GeoObjectCollection"][
@@ -94,12 +94,16 @@ def static_api(response, scale, layer):
     toponym_coodrinates = toponym["Point"]["pos"]
     # Долгота и широта:
     toponym_longitude, toponym_lattitude = toponym_coodrinates.split(" ")
-
+    if point:
+        pt = f'{",".join([toponym_longitude, toponym_lattitude])},pm2gnl'
+    else:
+        pt = ''
     # Собираем параметры для запроса к StaticMapsAPI:
     map_params = {
         "ll": ",".join([toponym_longitude, toponym_lattitude]),
         "z": scale,
-        "l": layer
+        "l": layer,
+        'pt': pt
     }
 
     map_api_server = "http://static-maps.yandex.ru/1.x/"
@@ -130,13 +134,14 @@ class Example(QWidget, Ui_Map):
         self.scale = '10'
         self.coords = ['37.22093', '55.99799']
         self.layer = 'map'
+        self.point = False
         self.setupUi(self)
         self.getImage()
         self.initUI()
 
     def getImage(self):
         geocoder = geocoder_find(','.join(self.coords))
-        response = static_api(geocoder, self.scale, self.layer)
+        response = static_api(geocoder, self.scale, self.layer, self.point)
 
         self.map_file = "map.png"
         with open(self.map_file, "wb") as file:
@@ -154,6 +159,18 @@ class Example(QWidget, Ui_Map):
         self.satelliteButton.clicked.connect(self.change_layer)
         self.schemeButton.clicked.connect(self.change_layer)
         self.hybridButton.clicked.connect(self.change_layer)
+
+        self.findButton.clicked.connect(self.find_object)
+
+    def find_object(self):
+        request = geocoder_find(self.inputLineEdit.text())
+        json_request = request.json()
+        self.coords = json_request["response"]["GeoObjectCollection"][
+        "featureMember"][0]["GeoObject"]['Point']['pos'].split(' ')
+        self.point = True
+        self.getImage()
+        self.show_image()
+
 
     def change_layer(self, button):
         if self.sender() == self.satelliteButton:
