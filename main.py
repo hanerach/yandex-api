@@ -8,45 +8,66 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-
 SCREEN_SIZE = [600, 450]
 
 
 class Ui_Map(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(1015, 870)
+        Dialog.resize(732, 782)
         self.horizontalLayout = QtWidgets.QHBoxLayout(Dialog)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.gridLayout = QtWidgets.QGridLayout()
         self.gridLayout.setObjectName("gridLayout")
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
+        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        self.schemeButton = QtWidgets.QPushButton(Dialog)
+        self.schemeButton.setObjectName("schemeButton")
+        self.horizontalLayout_2.addWidget(self.schemeButton)
+        self.satelliteButton = QtWidgets.QPushButton(Dialog)
+        self.satelliteButton.setObjectName("satelliteButton")
+        self.horizontalLayout_2.addWidget(self.satelliteButton)
+        self.hybridButton = QtWidgets.QPushButton(Dialog)
+        self.hybridButton.setObjectName("hybridButton")
+        self.horizontalLayout_2.addWidget(self.hybridButton)
+        self.verticalLayout.addLayout(self.horizontalLayout_2)
         self.image = QtWidgets.QLabel(Dialog)
         self.image.setObjectName("image")
         self.verticalLayout.addWidget(self.image)
-        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        self.satelliteRb = QtWidgets.QRadioButton(Dialog)
-        self.satelliteRb.setObjectName("satelliteRb")
-        self.LayersBtnGroup = QtWidgets.QButtonGroup(Dialog)
-        self.LayersBtnGroup.setObjectName("LayersBtnGroup")
-        self.LayersBtnGroup.addButton(self.satelliteRb)
-        self.horizontalLayout_2.addWidget(self.satelliteRb)
-        self.hybridRb = QtWidgets.QRadioButton(Dialog)
-        self.hybridRb.setObjectName("hybridRb")
-        self.LayersBtnGroup.addButton(self.hybridRb)
-        self.horizontalLayout_2.addWidget(self.hybridRb)
-        self.schemeRb = QtWidgets.QRadioButton(Dialog)
-        self.schemeRb.setObjectName("schemeRb")
-        self.LayersBtnGroup.addButton(self.schemeRb)
-        self.horizontalLayout_2.addWidget(self.schemeRb)
-        self.verticalLayout.addLayout(self.horizontalLayout_2)
-        self.verticalLayout.setStretch(0, 6)
-        self.verticalLayout.setStretch(1, 1)
+        self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
+        self.inputLineEdit = QtWidgets.QLineEdit(Dialog)
+        self.inputLineEdit.setInputMask("")
+        self.inputLineEdit.setText("")
+        self.inputLineEdit.setClearButtonEnabled(False)
+        self.inputLineEdit.setObjectName("inputLineEdit")
+        self.horizontalLayout_4.addWidget(self.inputLineEdit)
+        self.findButton = QtWidgets.QPushButton(Dialog)
+        self.findButton.setObjectName("findButton")
+        self.horizontalLayout_4.addWidget(self.findButton)
+        self.resetButton = QtWidgets.QPushButton(Dialog)
+        self.resetButton.setObjectName("resetButton")
+        self.horizontalLayout_4.addWidget(self.resetButton)
+        self.horizontalLayout_4.setStretch(0, 4)
+        self.horizontalLayout_4.setStretch(1, 1)
+        self.horizontalLayout_4.setStretch(2, 1)
+        self.verticalLayout.addLayout(self.horizontalLayout_4)
+        self.horizontalLayout_6 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_6.setObjectName("horizontalLayout_6")
+        self.adressLabel = QtWidgets.QLabel(Dialog)
+        self.adressLabel.setText("")
+        self.adressLabel.setObjectName("adressLabel")
+        self.horizontalLayout_6.addWidget(self.adressLabel)
+        self.indexButton = QtWidgets.QPushButton(Dialog)
+        self.indexButton.setObjectName("indexButton")
+        self.horizontalLayout_6.addWidget(self.indexButton)
+        self.horizontalLayout_6.setStretch(0, 2)
+        self.horizontalLayout_6.setStretch(1, 1)
+        self.verticalLayout.addLayout(self.horizontalLayout_6)
         self.gridLayout.addLayout(self.verticalLayout, 1, 0, 1, 1)
         self.horizontalLayout.addLayout(self.gridLayout)
-        self.satelliteRb.setChecked(True)
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
@@ -54,13 +75,17 @@ class Ui_Map(object):
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
+        self.schemeButton.setText(_translate("Dialog", "Схема"))
+        self.satelliteButton.setText(_translate("Dialog", "Спутник"))
+        self.hybridButton.setText(_translate("Dialog", "Гибрид"))
         self.image.setText(_translate("Dialog", "TextLabel"))
-        self.satelliteRb.setText(_translate("Dialog", "Спутник"))
-        self.hybridRb.setText(_translate("Dialog", "Гибрид"))
-        self.schemeRb.setText(_translate("Dialog", "Схема"))
+        self.inputLineEdit.setPlaceholderText(_translate("Dialog", "Введите адрес"))
+        self.findButton.setText(_translate("Dialog", "Искать"))
+        self.resetButton.setText(_translate("Dialog", "Сбросить"))
+        self.indexButton.setText(_translate("Dialog", "Вкл/выкл почтовый индекс"))
 
 
-def static_api(response, scale):
+def static_api(response, scale, layer):
     json_response = response.json()
     # Получаем первый топоним из ответа геокодера.
     toponym = json_response["response"]["GeoObjectCollection"][
@@ -74,7 +99,7 @@ def static_api(response, scale):
     map_params = {
         "ll": ",".join([toponym_longitude, toponym_lattitude]),
         "z": scale,
-        "l": "map"
+        "l": layer
     }
 
     map_api_server = "http://static-maps.yandex.ru/1.x/"
@@ -104,13 +129,14 @@ class Example(QWidget, Ui_Map):
         super().__init__()
         self.scale = '10'
         self.coords = ['37.22093', '55.99799']
+        self.layer = 'map'
         self.setupUi(self)
         self.getImage()
         self.initUI()
 
     def getImage(self):
         geocoder = geocoder_find(','.join(self.coords))
-        response = static_api(geocoder, self.scale)
+        response = static_api(geocoder, self.scale, self.layer)
 
         self.map_file = "map.png"
         with open(self.map_file, "wb") as file:
@@ -120,14 +146,27 @@ class Example(QWidget, Ui_Map):
         self.pixmap = QPixmap(self.map_file)
         self.image.setPixmap(self.pixmap)
 
-
     def initUI(self):
         self.setGeometry(100, 100, *SCREEN_SIZE)
         self.setWindowTitle('Отображение карты')
         self.show_image()
 
+        self.satelliteButton.clicked.connect(self.change_layer)
+        self.schemeButton.clicked.connect(self.change_layer)
+        self.hybridButton.clicked.connect(self.change_layer)
+
+    def change_layer(self, button):
+        if self.sender() == self.satelliteButton:
+            self.layer = 'sat'
+        elif self.sender() == self.schemeButton:
+            self.layer = 'map'
+        else:
+            self.layer = 'sat,skl'
+        self.getImage()
+        self.show_image()
 
     def keyPressEvent(self, event):
+        self.inputLineEdit.clearFocus()
         if event.key() == Qt.Key_PageUp:
             self.scale = str(int(self.scale) + 1)
         if event.key() == Qt.Key_PageDown:
@@ -143,15 +182,9 @@ class Example(QWidget, Ui_Map):
         self.getImage()
         self.show_image()
 
-
-
     def closeEvent(self, event):
         """При закрытии формы подчищаем за собой"""
         os.remove(self.map_file)
-
-    def change_scale(self):
-        pass
-
 
 
 if __name__ == '__main__':
