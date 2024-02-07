@@ -5,8 +5,8 @@ import sys
 import requests
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5 import QtCore, QtWidgets
 
 SCREEN_SIZE = [600, 450]
 
@@ -85,22 +85,14 @@ class Ui_Map(object):
         self.indexButton.setText(_translate("Dialog", "Вкл/выкл почтовый индекс"))
 
 
-def static_api(response, scale, layer, point):
-    json_response = response.json()
-    # Получаем первый топоним из ответа геокодера.
-    toponym = json_response["response"]["GeoObjectCollection"][
-        "featureMember"][0]["GeoObject"]
-    # Координаты центра топонима:
-    toponym_coodrinates = toponym["Point"]["pos"]
-    # Долгота и широта:
-    toponym_longitude, toponym_lattitude = toponym_coodrinates.split(" ")
+def static_api(coords, scale, layer, point):
     if point:
-        pt = f'{",".join([toponym_longitude, toponym_lattitude])},pm2gnl'
+        pt = f'{",".join(point)},pm2gnl'
     else:
         pt = ''
     # Собираем параметры для запроса к StaticMapsAPI:
     map_params = {
-        "ll": ",".join([toponym_longitude, toponym_lattitude]),
+        "ll": ",".join(coords),
         "z": scale,
         "l": layer,
         'pt': pt
@@ -134,14 +126,13 @@ class Example(QWidget, Ui_Map):
         self.scale = '10'
         self.coords = ['37.22093', '55.99799']
         self.layer = 'map'
-        self.point = False
+        self.point = ''
         self.setupUi(self)
         self.getImage()
         self.initUI()
 
     def getImage(self):
-        geocoder = geocoder_find(','.join(self.coords))
-        response = static_api(geocoder, self.scale, self.layer, self.point)
+        response = static_api(self.coords, self.scale, self.layer, self.point)
 
         self.map_file = "map.png"
         with open(self.map_file, "wb") as file:
@@ -164,13 +155,16 @@ class Example(QWidget, Ui_Map):
 
     def find_object(self):
         request = geocoder_find(self.inputLineEdit.text())
-        json_request = request.json()
-        self.coords = json_request["response"]["GeoObjectCollection"][
-        "featureMember"][0]["GeoObject"]['Point']['pos'].split(' ')
-        self.point = True
-        self.getImage()
-        self.show_image()
-
+        try:
+            json_request = request.json()
+            self.coords = json_request["response"]["GeoObjectCollection"][
+                "featureMember"][0]["GeoObject"]['Point']['pos'].split(' ')
+            self.point = json_request["response"]["GeoObjectCollection"][
+                "featureMember"][0]["GeoObject"]['Point']['pos'].split(' ')
+            self.getImage()
+            self.show_image()
+        except Exception:
+            self.inputLineEdit.setText('Объект не найден')
 
     def change_layer(self, button):
         if self.sender() == self.satelliteButton:
